@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Protected Page</title>
+</head>
+<body>
+  <h1>Secure Content</h1>
+  <div id="message">Verifying...</div>
+  <button id="logout">Logout</button>
+
+  <script>
+    const token = localStorage.getItem('token');
+    if (!token) return window.location = '/login.html';
+
+    fetch('/api/private', {
+      headers: { 'Authorization': 'Bearer ' + token }
+    })
+    .then(res => {
+      if (!res.ok) throw new Error();
+      return res.json();
+    })
+    .then(data => {
+      document.getElementById('message').innerText = data.message;
+    })
+    .catch(() => {
+      localStorage.removeItem('token');
+      window.location = '/login.html';
+    });
+
+    document.getElementById('logout').addEventListener('click', () => {
+      localStorage.removeItem('token');
+      window.location = '/login.html';
+    });
+  </script>
+</body>
+</html>
